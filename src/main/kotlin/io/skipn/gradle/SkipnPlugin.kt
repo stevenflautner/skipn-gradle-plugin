@@ -3,27 +3,23 @@ package io.skipn.gradle
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.artifacts.dsl.RepositoryHandler
-import org.gradle.api.attributes.Attribute
 import org.gradle.api.plugins.ApplicationPlugin
 import org.gradle.api.plugins.ExtensionAware
 import org.gradle.api.plugins.JavaApplication
-import org.gradle.api.tasks.Copy
 import org.gradle.api.tasks.JavaExec
-import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
-import org.jetbrains.kotlin.gradle.plugin.KotlinMultiplatformPluginWrapper
-import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinJvmCompilation
-import org.jetbrains.kotlin.gradle.targets.js.webpack.KotlinWebpack
-import java.io.File
 import org.gradle.api.tasks.bundling.Jar
 import org.gradle.kotlin.dsl.*
-import java.util.jar.Manifest
-import org.gradle.kotlin.dsl.accessors.runtime.*
-import org.jetbrains.kotlin.serialization.KotlinSerializerExtensionBase
+import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
+import org.jetbrains.kotlin.gradle.plugin.KotlinMultiplatformPluginWrapper
+import org.jetbrains.kotlin.gradle.targets.js.webpack.KotlinWebpack
 import org.jetbrains.kotlinx.serialization.gradle.SerializationGradleSubplugin
+import java.io.File
 
 class SkipnPlugin : Plugin<Project> {
     override fun apply(project: Project) {
         with(project) {
+            extensions.create<SkipnPluginExtension>("skipn")
+
             buildscript {
                 repositories {
                     all(project)
@@ -32,7 +28,11 @@ class SkipnPlugin : Plugin<Project> {
             repositories {
                 all(project)
             }
+        }
+    }
 
+    fun extensionInitialized(project: Project, extension: SkipnPluginExtension) {
+        with(project) {
             plugins.apply(ApplicationPlugin::class.java)
             plugins.apply(KotlinMultiplatformPluginWrapper::class.java)
             plugins.apply(SerializationGradleSubplugin::class.java)
@@ -79,20 +79,24 @@ class SkipnPlugin : Plugin<Project> {
                 sourceSets {
                     val commonMain by getting {
                         dependencies {
-                            implementation("io.skipn:skipn:0.0.1b")
-                            implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.3.9")
-                            implementation("org.jetbrains.kotlinx:kotlinx-serialization-runtime:1.0-M1-1.4.0-rc")
+                            implementation("io.skipn:skipn:0.0.91")
+                            implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.4.0")
+                            implementation("org.jetbrains.kotlinx:kotlinx-serialization-core:1.0.1")
+                            implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.0.1")
+//                            implementation("org.jetbrains.kotlinx:kotlinx-serialization-runtime:1.0-M1-1.4.0-rc")
 
                             implementation("io.ktor:ktor-client-core:$kversion")
                             implementation("io.ktor:ktor-client-json:$kversion")
                             implementation("io.ktor:ktor-client-serialization:$kversion")
-                            implementation("org.jetbrains.kotlin:kotlin-stdlib-common:1.4.10")
+//                            implementation("org.jetbrains.kotlin:kotlin-stdlib-common:1.4.10")
                             implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.1.0")
 //                            implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.0-M1-1.4.0-rc")
+                            extension.common.dependency?.invoke(this)
                         }
                     }
                     val browserMain by getting {
                         dependencies {
+//                            implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core-js:1.4.0")
                             implementation(devNpm("postcss-loader", "4.0.0"))
                             implementation(devNpm("postcss", "7.0.32"))
                             implementation(devNpm("raw-loader", ""))
@@ -100,6 +104,7 @@ class SkipnPlugin : Plugin<Project> {
                             implementation(npm("css-loader", "3.4.2"))
                             implementation(npm("style-loader", "1.1.3"))
                             implementation(npm("google-maps", "4.3.3"))
+                            extension.browser.dependency?.invoke(this)
                         }
                     }
                     val serverMain by getting {
@@ -107,6 +112,24 @@ class SkipnPlugin : Plugin<Project> {
                             implementation("io.ktor:ktor-server-netty:$kversion")
                             implementation("io.ktor:ktor-html-builder:$kversion")
                             implementation("io.ktor:ktor-serialization:$kversion")
+                            extension.server.dependency?.invoke(this)
+                        }
+                    }
+
+                    val commonTest by getting {
+                        dependencies {
+                            implementation(kotlin("test-common"))
+                            implementation(kotlin("test-annotations-common"))
+                        }
+                    }
+                    val serverTest by getting {
+                        dependencies {
+                            implementation(kotlin("test-junit"))
+                        }
+                    }
+                    val browserTest by getting {
+                        dependencies {
+                            implementation(kotlin("test-js"))
                         }
                     }
                 }
@@ -185,7 +208,18 @@ private fun RepositoryHandler.all(project: Project) {
     maven {
         url = project.uri("https://jitpack.io")
     }
-//    maven {
-//        url = project.uri("https://dl.bintray.com/skipn/skipn")
-//    }
+    maven {
+        url = project.uri("https://dl.bintray.com/skipn/skipn")
+    }
+}
+
+fun Project.skipn(configure: SkipnPluginExtension.() -> Unit) {
+    (this as ExtensionAware).extensions.configure(
+        "skipn",
+        configure
+    )
+    plugins.getAt(SkipnPlugin::class.java).extensionInitialized(
+        this,
+        extensions.getByType()
+    )
 }

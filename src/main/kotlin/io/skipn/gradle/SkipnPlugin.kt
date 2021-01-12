@@ -107,7 +107,7 @@ class SkipnPlugin : Plugin<Project> {
                 sourceSets {
                     val commonMain by getting {
                         dependencies {
-                            implementation("io.skipn:skipn:0.0.9952")
+                            implementation("io.skipn:skipn:0.0.9956")
                             implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.4.0")
                             implementation("org.jetbrains.kotlinx:kotlinx-serialization-core:1.0.1")
                             implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.0.1")

@@ -48,7 +48,7 @@ class SkipnPlugin : Plugin<Project> {
             configureMultiplatform {
                 jvm("server") {
                     compilations.all {
-                        kotlinOptions.jvmTarget = "1.8"
+                        kotlinOptions.jvmTarget = "11"
                     }
                     withJava()
                     val serverJar by tasks.getting(org.gradle.jvm.tasks.Jar::class) {
@@ -60,18 +60,21 @@ class SkipnPlugin : Plugin<Project> {
                         }
                     }
                 }
-                js("browser") {
-                    useCommonJs()
+                js("browser", LEGACY) {
+//                    useCommonJs()
 
                     browser {
                         binaries.executable()
+
                         webpackTask {
+//                            sourceMaps = false
                             cssSupport.enabled = true
                             if (mode == org.jetbrains.kotlin.gradle.targets.js.webpack.KotlinWebpackConfig.Mode.PRODUCTION) {
                                 cssSupport.mode = org.jetbrains.kotlin.gradle.targets.js.webpack.KotlinWebpackCssMode.EXTRACT
                             }
                         }
                         runTask {
+//                            sourceMaps = false
                             cssSupport.enabled = true
                             if (mode == org.jetbrains.kotlin.gradle.targets.js.webpack.KotlinWebpackConfig.Mode.PRODUCTION) {
                                 cssSupport.mode = org.jetbrains.kotlin.gradle.targets.js.webpack.KotlinWebpackCssMode.EXTRACT
@@ -107,15 +110,15 @@ class SkipnPlugin : Plugin<Project> {
                 sourceSets {
                     val commonMain by getting {
                         dependencies {
-                            implementation("io.skipn:skipn:0.0.9956")
-                            implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.4.0")
+                            implementation("io.skipn:skipn:0.0.99593_9o3")
+                            implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:$kversion")
                             implementation("org.jetbrains.kotlinx:kotlinx-serialization-core:1.0.1")
                             implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.0.1")
 //                            implementation("org.jetbrains.kotlinx:kotlinx-serialization-runtime:1.0-M1-1.4.0-rc")
 
-                            implementation("io.ktor:ktor-client-core:$kversion")
-                            implementation("io.ktor:ktor-client-json:$kversion")
-                            implementation("io.ktor:ktor-client-serialization:$kversion")
+//                            implementation("io.ktor:ktor-client-core:$kversion")
+//                            implementation("io.ktor:ktor-client-json:$kversion")
+//                            implementation("io.ktor:ktor-client-serialization:$kversion")
 //                            implementation("org.jetbrains.kotlin:kotlin-stdlib-common:1.4.10")
                             implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.1.0")
 //                            implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.0-M1-1.4.0-rc")
@@ -131,15 +134,20 @@ class SkipnPlugin : Plugin<Project> {
                             implementation(npm("tailwindcss", "v2.0.1"))
 //                            implementation(npm("css-loader", "5.0.1"))
 //                            implementation(npm("style-loader", "2.0.0"))
-                            implementation(npm("google-maps", "4.3.3"))
+//                            implementation(npm("google-maps", "4.3.3"))
                             extension.browser.dependency?.invoke(this)
                         }
                     }
                     val serverMain by getting {
+                        val ktorVersion = "1.5.1"
                         dependencies {
-                            implementation("io.ktor:ktor-server-netty:$kversion")
+                            implementation("io.ktor:ktor-server-netty:$ktorVersion")
 //                            implementation("io.ktor:ktor-html-builder:$kversion")
-                            implementation("io.ktor:ktor-serialization:$kversion")
+                            implementation("io.ktor:ktor-serialization:$ktorVersion")
+
+                            implementation("io.ktor:ktor-client-core:$ktorVersion")
+                            implementation("io.ktor:ktor-client-json:$ktorVersion")
+                            implementation("io.ktor:ktor-client-serialization:$ktorVersion")
                             extension.server.dependency?.invoke(this)
                         }
                     }
@@ -170,9 +178,18 @@ class SkipnPlugin : Plugin<Project> {
                 outputFileName = "output.js"
             }
 
+            tasks.create<JavaExec>("serverRunDev").apply {
+//                environment("DEV", true)
+//                args.add("DEV")
+                systemProperty("DEV", true)
+
+                dependsOn(tasks.getByName("serverJar"))
+                classpath(tasks.getByName("serverJar"))
+            }
+
             tasks.getByName<Jar>("serverJar") {
                 dependsOn(
-                    tasks.getByName("browserBrowserProductionWebpack"),
+//                    tasks.getByName("browserBrowserProductionWebpack"),
                     tasks.getByName("generateSkipnMeta")
                 )
 
@@ -200,8 +217,13 @@ class SkipnPlugin : Plugin<Project> {
             }
 
             tasks.getByName<JavaExec>("run") .apply {
+                dependsOn(tasks.getByName("browserBrowserProductionWebpack"))
                 dependsOn(tasks.getByName("serverJar"))
                 classpath(tasks.getByName("serverJar"))
+            }
+            tasks.getByName<Jar>("jar") .apply {
+                dependsOn(tasks.getByName("browserBrowserProductionWebpack"))
+                dependsOn(tasks.getByName("serverJar"))
             }
         }
     }

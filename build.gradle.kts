@@ -2,7 +2,7 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import java.util.Date
 
 plugins {
-    kotlin("jvm") version "1.4.21"
+    kotlin("jvm") version "1.4.30-RC"
     id("java-gradle-plugin")
     id("maven")
     id("org.gradle.kotlin.kotlin-dsl") version "1.4.2"
@@ -21,7 +21,7 @@ plugins {
 //}
 
 group = "io.skipn"
-version = "0.0.9956"
+version = "0.0.99593_9o5"
 
 repositories {
     maven {
@@ -34,11 +34,11 @@ repositories {
 
 dependencies {
     testImplementation(kotlin("test-junit"))
-    implementation("org.jetbrains.kotlin:kotlin-gradle-plugin:1.4.21")
-    implementation("org.jetbrains.kotlin:kotlin-serialization:1.4.21")
+    implementation("org.jetbrains.kotlin:kotlin-gradle-plugin:1.4.30")
+    implementation("org.jetbrains.kotlin:kotlin-serialization:1.4.30")
 }
 tasks.withType<KotlinCompile> {
-    kotlinOptions.jvmTarget = "1.8"
+    kotlinOptions.jvmTarget = "11"
 }
 
 gradlePlugin {

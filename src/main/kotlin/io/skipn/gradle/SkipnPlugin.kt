@@ -110,7 +110,7 @@ class SkipnPlugin : Plugin<Project> {
                 sourceSets {
                     val commonMain by getting {
                         dependencies {
-                            implementation("io.skipn:skipn:0.0.99593_9o3")
+                            implementation("io.skipn:skipn:0.0.1ori5")
                             implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:$kversion")
                             implementation("org.jetbrains.kotlinx:kotlinx-serialization-core:1.0.1")
                             implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.0.1")
@@ -243,6 +243,9 @@ class SkipnPlugin : Plugin<Project> {
 // Providing most repositories so that a beginner doesn't
 // have to worry about missing repositories
 private fun RepositoryHandler.all(project: Project) {
+    maven {
+        url = project.uri("https://dl.bintray.com/skipn/skipn")
+    }
     mavenCentral()
     jcenter()
     mavenLocal()
@@ -257,9 +260,6 @@ private fun RepositoryHandler.all(project: Project) {
     }
     maven {
         url = project.uri("https://jitpack.io")
-    }
-    maven {
-        url = project.uri("https://dl.bintray.com/skipn/skipn")
     }
 }
 

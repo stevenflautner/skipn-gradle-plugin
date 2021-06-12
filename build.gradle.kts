@@ -7,7 +7,7 @@ plugins {
     id("maven")
     id("org.gradle.kotlin.kotlin-dsl") version "1.4.2"
     id("maven-publish")
-    id("com.jfrog.bintray") version "1.8.4"
+//    id("com.jfrog.bintray") version "1.8.4"
 }
 
 //publishing {
@@ -21,14 +21,21 @@ plugins {
 //}
 
 group = "io.skipn"
-version = "0.0.1ori5"
+version = "0.0.2"
 
 repositories {
     maven {
         url = uri("https://plugins.gradle.org/m2/")
     }
+
+    val mavenUser: String by project
+    val mavenPassword: String by project
     maven {
-        url = uri("https://dl.bintray.com/skipn/skipn")
+        url = uri("https://maven.pkg.jetbrains.space/nambda/p/tools/skipn")
+        credentials {
+            username = mavenUser
+            password = mavenPassword
+        }
     }
 }
 
@@ -63,61 +70,86 @@ val versionDescription = "Pre-release 0.0.1"
 val license = "MIT"
 val projVcsUrl = "https://github.com/stevenflautner/skipn-gradle-plugin.git"
 
-val sourcesJar by tasks.creating(Jar::class) {
-    archiveClassifier.set("sources")
-    from(sourceSets.getByName("main").allSource)
-}
+//val sourcesJar by tasks.creating(Jar::class) {
+//    archiveClassifier.set("sources")
+//    from(sourceSets.getByName("main").allSource)
+//}
 
-publishing {
-    publications {
-        create<MavenPublication>("skipn-gradle-plugin") {
-            groupId = artifactGroup
-            artifactId = artifactName
-            version = artifactVersion
-            from(components["java"])
-
-            artifact(sourcesJar)
-
-//            pom.withXml {
-//                asNode().apply {
-//                    appendNode("description", pomDesc)
-//                    appendNode("name", rootProject.name)
-//                    appendNode("url", pomUrl)
-//                    appendNode("licenses").appendNode("license").apply {
-//                        appendNode("name", pomLicenseName)
-//                        appendNode("url", pomLicenseUrl)
-//                        appendNode("distribution", pomLicenseDist)
-//                    }
-//                    appendNode("developers").appendNode("developer").apply {
-//                        appendNode("id", pomDeveloperId)
-//                        appendNode("name", pomDeveloperName)
-//                    }
-//                    appendNode("scm").apply {
-//                        appendNode("url", pomScmUrl)
-//                    }
+//publishing {
+//    publications {
+//        create<MavenPublication>("skipn-gradle-plugin") {
+//            groupId = artifactGroup
+//            artifactId = artifactName
+//            version = artifactVersion
+//            from(components["java"])
+//
+//            artifact(sourcesJar)
+//
+////            pom.withXml {
+////                asNode().apply {
+////                    appendNode("description", pomDesc)
+////                    appendNode("name", rootProject.name)
+////                    appendNode("url", pomUrl)
+////                    appendNode("licenses").appendNode("license").apply {
+////                        appendNode("name", pomLicenseName)
+////                        appendNode("url", pomLicenseUrl)
+////                        appendNode("distribution", pomLicenseDist)
+////                    }
+////                    appendNode("developers").appendNode("developer").apply {
+////                        appendNode("id", pomDeveloperId)
+////                        appendNode("name", pomDeveloperName)
+////                    }
+////                    appendNode("scm").apply {
+////                        appendNode("url", pomScmUrl)
+////                    }
+////                }
+////            }
+//        }
+//
+//        bintray {
+//            user = "stevenflautner"
+//            key = project.findProperty("bintrayKey").toString()
+//            publish = true
+//
+//            setPublications("skipn-gradle-plugin")
+//
+//            pkg.apply {
+//                repo = bintrayRepo
+//                name = packageName
+//                userOrg = "skipn"
+//                setLicenses("MIT")
+//                vcsUrl = projVcsUrl
+//                version.apply {
+//                    name = artifactVersion
+//                    desc = versionDescription
+//                    released = Date().toString()
+//                    vcsTag = artifactVersion
 //                }
 //            }
-        }
+//        }
+//    }
+//}
 
-        bintray {
-            user = "stevenflautner"
-            key = project.findProperty("bintrayKey").toString()
-            publish = true
+publishing {
+//    publications {
+////        create<MavenPublication>("maven") {
+////            groupId = rootProject.group.toString()
+////            artifactId = rootProject.name
+////            version = version
+////            from(components["java"])
+////
+//////            artifact(sourcesJar)
+////        }
+//    }
 
-            setPublications("skipn-gradle-plugin")
-
-            pkg.apply {
-                repo = bintrayRepo
-                name = packageName
-                userOrg = "skipn"
-                setLicenses("MIT")
-                vcsUrl = projVcsUrl
-                version.apply {
-                    name = artifactVersion
-                    desc = versionDescription
-                    released = Date().toString()
-                    vcsTag = artifactVersion
-                }
+    val mavenUser: String by project
+    val mavenPassword: String by project
+    repositories {
+        maven {
+            url = uri("https://maven.pkg.jetbrains.space/nambda/p/tools/skipn-gradle-plugin")
+            credentials {
+                username = mavenUser
+                password = mavenPassword
             }
         }
     }

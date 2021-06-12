@@ -21,7 +21,7 @@ plugins {
 //}
 
 group = "io.skipn"
-version = "0.0.2"
+version = "0.0.22"
 
 repositories {
     maven {

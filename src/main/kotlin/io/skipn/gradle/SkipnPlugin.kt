@@ -14,8 +14,8 @@ import org.jetbrains.kotlin.gradle.plugin.KotlinMultiplatformPluginWrapper
 import org.jetbrains.kotlin.gradle.plugin.KotlinTarget
 import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinJsCompilation
 import org.jetbrains.kotlin.gradle.targets.js.npm.NpmProject
-import org.jetbrains.kotlin.gradle.targets.js.npm.packageJson
 import org.jetbrains.kotlin.gradle.targets.js.webpack.KotlinWebpack
+import org.jetbrains.kotlin.gradle.targets.js.webpack.KotlinWebpackConfig.Mode.PRODUCTION
 import org.jetbrains.kotlinx.serialization.gradle.SerializationGradleSubplugin
 import java.io.File
 
@@ -60,23 +60,25 @@ class SkipnPlugin : Plugin<Project> {
                         }
                     }
                 }
-                js("browser", LEGACY) {
+                js("browser", IR) {
 //                    useCommonJs()
 
                     browser {
                         binaries.executable()
 
                         webpackTask {
-//                            sourceMaps = false
+                            if (mode == PRODUCTION) {
+                                args.plusAssign(listOf( "--node-env=production" ))
+                            }
+
                             cssSupport.enabled = true
-                            if (mode == org.jetbrains.kotlin.gradle.targets.js.webpack.KotlinWebpackConfig.Mode.PRODUCTION) {
+                            if (mode == PRODUCTION) {
                                 cssSupport.mode = org.jetbrains.kotlin.gradle.targets.js.webpack.KotlinWebpackCssMode.EXTRACT
                             }
                         }
                         runTask {
-//                            sourceMaps = false
                             cssSupport.enabled = true
-                            if (mode == org.jetbrains.kotlin.gradle.targets.js.webpack.KotlinWebpackConfig.Mode.PRODUCTION) {
+                            if (mode == PRODUCTION) {
                                 cssSupport.mode = org.jetbrains.kotlin.gradle.targets.js.webpack.KotlinWebpackCssMode.EXTRACT
                             }
                         }
@@ -105,12 +107,12 @@ class SkipnPlugin : Plugin<Project> {
 //                    }
                 }
 
-                val kversion = "1.4.2"
+                val kversion = "1.5.2"
 
                 sourceSets {
                     val commonMain by getting {
                         dependencies {
-                            implementation("io.skipn:skipn:0.0.2")
+                            implementation("io.skipn:skipn:0.0.28")
                             implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:$kversion")
                             implementation("org.jetbrains.kotlinx:kotlinx-serialization-core:1.0.1")
                             implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.0.1")
@@ -128,10 +130,10 @@ class SkipnPlugin : Plugin<Project> {
                     val browserMain by getting {
                         dependencies {
 //                            implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core-js:1.4.0")
-                            implementation(devNpm("postcss-loader", "4.1.0"))
-                            implementation(devNpm("postcss", "8.1.10"))
-                            implementation(devNpm("raw-loader", ""))
-                            implementation(npm("tailwindcss", "v2.0.1"))
+                            implementation(devNpm("postcss-loader", "6.1.0"))
+                            implementation(devNpm("postcss", "8.3.7"))
+                            implementation(devNpm("raw-loader", "4.0.2"))
+                            implementation(npm("tailwindcss", "2.2.15"))
 //                            implementation(npm("css-loader", "5.0.1"))
 //                            implementation(npm("style-loader", "2.0.0"))
 //                            implementation(npm("google-maps", "4.3.3"))
@@ -244,7 +246,6 @@ class SkipnPlugin : Plugin<Project> {
 // have to worry about missing repositories
 private fun RepositoryHandler.all(project: Project) {
     mavenCentral()
-    jcenter()
     mavenLocal()
     maven {
         url = project.uri("https://plugins.gradle.org/m2/")

@@ -2,10 +2,10 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import java.util.Date
 
 plugins {
-    kotlin("jvm") version "1.4.30-RC"
+    kotlin("jvm") version "1.6.0-M1"
     id("java-gradle-plugin")
-    id("maven")
-    id("org.gradle.kotlin.kotlin-dsl") version "1.4.2"
+//    id("maven")
+    id("org.gradle.kotlin.kotlin-dsl") version "2.1.7"
     id("maven-publish")
 //    id("com.jfrog.bintray") version "1.8.4"
 }
@@ -21,7 +21,7 @@ plugins {
 //}
 
 group = "io.skipn"
-version = "0.0.23"
+version = "0.0.28"
 
 repositories {
     maven {
@@ -41,8 +41,8 @@ repositories {
 
 dependencies {
     testImplementation(kotlin("test-junit"))
-    implementation("org.jetbrains.kotlin:kotlin-gradle-plugin:1.4.30")
-    implementation("org.jetbrains.kotlin:kotlin-serialization:1.4.30")
+    implementation("org.jetbrains.kotlin:kotlin-gradle-plugin:1.6.0-M1")
+    implementation("org.jetbrains.kotlin:kotlin-serialization:1.6.0-M1")
 }
 tasks.withType<KotlinCompile> {
     kotlinOptions.jvmTarget = "11"

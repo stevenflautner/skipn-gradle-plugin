@@ -81,6 +81,7 @@ class SkipnPlugin : Plugin<Project> {
                             if (mode == PRODUCTION) {
                                 cssSupport.mode = org.jetbrains.kotlin.gradle.targets.js.webpack.KotlinWebpackCssMode.EXTRACT
                             }
+                            devServer = devServer?.copy(port = 8080)
                         }
                         testTask {
                             useKarma {
@@ -107,22 +108,20 @@ class SkipnPlugin : Plugin<Project> {
 //                    }
                 }
 
-                val kversion = "1.5.2"
-
                 sourceSets {
                     val commonMain by getting {
                         dependencies {
-                            implementation("io.skipn:skipn:0.0.28")
-                            implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:$kversion")
-                            implementation("org.jetbrains.kotlinx:kotlinx-serialization-core:1.0.1")
-                            implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.0.1")
+                            implementation("io.skipn:skipn:0.0.30")
+                            implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.0")
+                            implementation("org.jetbrains.kotlinx:kotlinx-serialization-core:1.3.2")
+                            implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.3.2")
 //                            implementation("org.jetbrains.kotlinx:kotlinx-serialization-runtime:1.0-M1-1.4.0-rc")
 
 //                            implementation("io.ktor:ktor-client-core:$kversion")
 //                            implementation("io.ktor:ktor-client-json:$kversion")
 //                            implementation("io.ktor:ktor-client-serialization:$kversion")
 //                            implementation("org.jetbrains.kotlin:kotlin-stdlib-common:1.4.10")
-                            implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.1.0")
+                            implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.3.2")
 //                            implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.0-M1-1.4.0-rc")
                             extension.common.dependency?.invoke(this)
                         }
